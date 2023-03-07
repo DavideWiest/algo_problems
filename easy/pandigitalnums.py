@@ -1,4 +1,5 @@
 import math
+from tqdm import trange
 
 DIGITS = [n for n in range(1,10)]
 
@@ -35,7 +36,7 @@ def findAllPandigital() -> list:
     m1_lo, m1_hi = 10, 100
     m2_lo, m2_hi = 100, 1000
 
-    for m1 in range(m1_lo, m1_hi):
+    for m1 in trange(m1_lo, m1_hi):
         for m2 in range(m2_lo, m2_hi):
             if isPandigital(m1,m2,m1*m2):
                 pandigitals.append(m1*m2)
