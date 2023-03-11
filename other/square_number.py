@@ -2,6 +2,7 @@ import math
 import random
 import numpy as np
 from matplotlib import pyplot as plt
+import sys
 
 from performance import compare_speed
 
@@ -54,14 +55,12 @@ def squareNumInRange(target, lo, hi):
     elif newSq < target: return squareNumInRange(target, math.floor(new), hi)
 
 def squareNumInRange(target, lo, hi):
-    f = lo-hi
-    new = lo+f*0.5
+    new = (lo+hi)*0.5
     newSq = new**2
     if newSq == target: return new
-    if f <= 1:
-        g = lo**2
-        if g == target: return lo
-        elif g + 2*lo*f + f**2 == target: return hi
+    if hi-lo <= 1:
+        if lo**2 == target: return lo
+        elif hi**2 == target: return hi
         return False
     if newSq > target: return squareNumInRange(target, lo, math.ceil(new)) # check for bigger first because new*new will statistically more often be too large
     elif newSq < target: return squareNumInRange(target, math.floor(new), hi)
@@ -82,6 +81,7 @@ def isSquareNumber(n):
 
 def isSquareNumber2(n):
     firstDigit = numDigits(n)[-1]
+    if firstDigit == 10: firstDigit = 0
     
     if firstDigit in SQAURE_UNREACHABLE_DIGITS: return False
     
@@ -89,32 +89,42 @@ def isSquareNumber2(n):
         if rootDigit > math.floor(n/2): continue
 
         a = squareNumInRange(n, rootDigit, math.floor(n/2))
-        if a != True: return a
+        if a != False: return a
         
     return False
     
 def isSquareNumber3(n):
     sqrt = math.sqrt(n)
     if sqrt == round(sqrt):
-        return True
-    return False
-
-def isSquareNumber4(n):    
-    if str(n)[-1] in SQAURE_UNREACHABLE_DIGITS_STR: return False
-    
-    for rootDigit in [r for r in SQAURE_FIRST_DIGITS_STR[str(n)[-1]] if r > math.floor(n/2)]:
-        a = squareNumInRange(n, rootDigit, math.floor(n/2))
-        if a != True: return a
+        return sqrt
         
     return False
 
+def isSquareNumber4(n):
+    d = str(n)[-1]
+    if d in SQAURE_UNREACHABLE_DIGITS_STR: return False
+    f = math.floor(n/2)
+    
+    for rootDigit in [r for r in SQAURE_FIRST_DIGITS_STR[d] if r <= f]:
+        a = squareNumInRange(n, rootDigit, f)
+        if a != False: return a
+    
+    return False
+
+def isSquareNumber5(n):
+    d = str(n)[-1]
+    if d in SQAURE_UNREACHABLE_DIGITS_STR: return False
+    f = math.floor(n/2)
+    
+    for rootDigit in [r for r in SQAURE_FIRST_DIGITS_STR[d] if r <= f]:
+        a = squareNumInRange(n, rootDigit, f)
+        if a != False: return a
+    
+    return False
+
+# lo = 10 ** (math.floor((len(str(n))+1)/2)-1)
+
 if __name__=='__main__':
-    # print(isSquareNumber(4))
-    # print(isSquareNumber(81))
-    # print(isSquareNumber(9))
-    # print(isSquareNumber(24))
-    # print(isSquareNumber(72))
-    # print("-------")
     # print(isSquareNumber2(4))
     # print(isSquareNumber2(81))
     # print(isSquareNumber2(9))
@@ -122,11 +132,11 @@ if __name__=='__main__':
     # print(isSquareNumber2(72))
 
     # inputs = [[n] for n in [0,1,4,9,16,25,36,49,64,81,100,121,144,3034564,2205225,2238016]] + \
-    inputs = [[a] for a in range(1,500_000_0) if random.randint(1,1000) == 69]
+    inputs = [[a] for a in range(1,100_000_000) if random.randint(1,1000) == 69]
     # filterLambda = lambda x: x == True
     # inputs = [[n] for n in [0,1,4,9,16,25,36,49,64,81,100,121,144,3034564,2205225,2238016]]
     filterLambda = lambda x: True
-    fnList = [isSquareNumber2,isSquareNumber3, isSquareNumber4]
+    fnList = [isSquareNumber3, isSquareNumber4, isSquareNumber5]
     input_time_dict = compare_speed(fnList, inputs, print_inputs=True, timeUnit="ns", filterByOutputLambda=filterLambda)
 
     colorByIndex = ["g", "r", "m", "c"]
@@ -142,4 +152,4 @@ if __name__=='__main__':
     
         abline(slope, intercept, color, fnName)
 
-    plt.show()
+    # plt.show()
