@@ -21,7 +21,7 @@ def numDigits(n):
 def isPandigital(m1,m2,p) -> bool:
     "True if arguments have all digits from 1 to 9"
     
-    combinedDigits = digitsOfNum(m1) + digitsOfNum(m2) + digitsOfNum(p)
+    combinedDigits = numDigits(m1) + numDigits(m2) + numDigits(p)
     if len(combinedDigits) != 10: return False
     
 
