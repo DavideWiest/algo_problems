@@ -31,7 +31,6 @@ resultList = [
     for n in range(R)
     if n not in abundantNumsCombsSums
 ]
-
 print(sum(resultList))
 
 # for n1 in abundantNums:

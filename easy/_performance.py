@@ -1,5 +1,7 @@
 from tqdm import tqdm
 import time
+import numpy as np
+from matplotlib import pyplot as plt
 
 timeUnits_tMul = {
     "ns": 1_000_000,
@@ -50,3 +52,28 @@ def compare_speed(fns, input_args_list, print_inputs=False, print_outputs=True, 
         print("\n", " | ".join(f"{fns[i].__name__}: {avgTimes[i][0]:.3f}{timeUnit}" for i in range(len(fns))))
 
     return input_time_dict
+
+colorByIndex = ["g", "r", "m", "c"]
+
+def abline(slope, intercept, color, label):
+    """Plot a line from slope and intercept"""
+    axes = plt.gca()
+    x_vals = np.array(axes.get_xlim())
+    y_vals = intercept + slope * x_vals
+    plt.plot(x_vals, y_vals, '--', c=color, label=label)
+
+def visualize_speed(fns, input_time_dict, pltShow=True):
+
+    for fnIndex in input_time_dict:
+        fnName = fns[fnIndex]
+        color = colorByIndex[fnIndex]
+        keys = list(input_time_dict[fnIndex].keys())
+        values = list(input_time_dict[fnIndex].values())
+        plt.scatter(keys, values, c=color)
+        out = np.polyfit(keys, values, 1)
+        slope, intercept = out[0], out[1]
+    
+        abline(slope, intercept, color, fnName)
+
+    if pltShow:
+        plt.show()

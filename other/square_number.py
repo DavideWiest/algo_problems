@@ -4,14 +4,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 import sys
 
-from performance import compare_speed
-
-def abline(slope, intercept, color, label):
-    """Plot a line from slope and intercept"""
-    axes = plt.gca()
-    x_vals = np.array(axes.get_xlim())
-    y_vals = intercept + slope * x_vals
-    plt.plot(x_vals, y_vals, '--', c=color, label=label)
+from _performance import compare_speed, abline, visualize_speed
 
 def numDigits(n):
     if n < 0: n *= -1
@@ -132,24 +125,11 @@ if __name__=='__main__':
     # print(isSquareNumber2(72))
 
     # inputs = [[n] for n in [0,1,4,9,16,25,36,49,64,81,100,121,144,3034564,2205225,2238016]] + \
-    inputs = [[a] for a in range(1,100_000_000) if random.randint(1,1000) == 69]
+    inputs = [[a] for a in range(1,100_000_00) if random.randint(1,1000) == 69]
     # filterLambda = lambda x: x == True
     # inputs = [[n] for n in [0,1,4,9,16,25,36,49,64,81,100,121,144,3034564,2205225,2238016]]
     filterLambda = lambda x: True
     fnList = [isSquareNumber3, isSquareNumber4, isSquareNumber5]
     input_time_dict = compare_speed(fnList, inputs, print_inputs=True, timeUnit="ns", filterByOutputLambda=filterLambda)
 
-    colorByIndex = ["g", "r", "m", "c"]
-
-    for fnIndex in input_time_dict:
-        fnName = fnList[fnIndex]
-        color = colorByIndex[fnIndex]
-        keys = list(input_time_dict[fnIndex].keys())
-        values = list(input_time_dict[fnIndex].values())
-        plt.scatter(keys, values, c=color)
-        out = np.polyfit(keys, values, 1)
-        slope, intercept = out[0], out[1]
-    
-        abline(slope, intercept, color, fnName)
-
-    # plt.show()
+    visualize_speed(fnList, input_time_dict)
