@@ -1,38 +1,23 @@
 
 
-def numDigitsByStr(n):
-    return [int(d) for d in str(n)]
+numToDigits = lambda n: [int(d) for d in str(n)]
+digitsToNum = lambda ds: int("".join(str(n) for n in ds))
+allUnique = lambda x: len(x) == len(set(x))
 
-def mergeDigitsToNum(*nums):
-    return int("".join(str(num) for num in nums))
+END = 7
+DIVISORS = [2,3,5,7,11,13,17]
+STARTING_LIST = [a for a in range(100, 1000) if allUnique(numToDigits(a))]
 
-
-# END = 9
-END = 4
-
-# DIVISORS = [3,5,7,11,13,17]
-DIVISORS = [3,5,7,11]
-
-conditions = [
-    lambda x,y,z: mergeDigitsToNum(x,y,z) % div == 0
-    for div in DIVISORS
-]
-
-conditionsAsRemainder = [
-    lambda x,y,z: mergeDigitsToNum(x,y,z) % div
-    for div in DIVISORS
-]
-
-# startingList = [a for a in range(1000, 9999, 2)]
-startingList = [a for a in range(100, 999, 2)]
-
+class conditions():
+    def __getitem__(self, i):
+        return lambda x,y,z: digitsToNum(x,y,z) % DIVISORS[i] == 0
+    
 def recursivelyFindPandigitals(d1,d2, digitsUsed, level, conditions):
     if level >= END: return [[0]]
 
     fittingDigits = []
     for i in range(10):
         if i in digitsUsed: continue
-        print(level)
         if not conditions[level](d1, d2, i): continue
 
         digitsUsed.append(i)
@@ -45,29 +30,30 @@ def recursivelyFindPandigitals(d1,d2, digitsUsed, level, conditions):
 def recursivelyFindPandigitalsStart(startingList):
     pandigitals = []
     for num in startingList:
-        digitsUsed = numDigitsByStr(num)
+        digitsUsed = numToDigits(num)
         pandigitals += [
-            mergeDigitsToNum(*digitsUsed, *fittingDigits[:-1]) \
-            for fittingDigits in recursivelyFindPandigitals(digitsUsed[-2], digitsUsed[-1], digitsUsed, 0, conditions)]
+            digitsToNum(*digitsUsed, *fittingDigits[:-1]) \
+            for fittingDigits in recursivelyFindPandigitals(digitsUsed[-2], digitsUsed[-1], digitsUsed, 0, conditions())]
 
     return pandigitals
 
+if __name__ == '__main__':
+    pandigitals = recursivelyFindPandigitalsStart(STARTING_LIST)
+    print(sum(pandigitals))
+
+
+
+class conditionsAsString():
+    def __getitem__(self, i):
+        return lambda x,y,z: f"{digitsToNum(x,y,z)} % {DIVISORS[i]} = {digitsToNum(x,y,z) % DIVISORS[i]}"
+
 def testDivisions(pandigitals):
-    numStartingDigits = len(str(startingList[0]))
-    
+    numStartingDigits = len(str(STARTING_LIST[0]))
+    conditionsAsStringInstance = conditionsAsString()
     for pandigital in pandigitals:
-        digitsToTest = numDigitsByStr(pandigital)[numStartingDigits-2:]
+        pandigital = pandigital
+        digitsToTest = numToDigits(pandigital)[numStartingDigits-2:]
         print(pandigital)
         for i, cond in enumerate(conditions):
-            print(digitsToTest[i:i+3])
-            print(f"{mergeDigitsToNum(*digitsToTest[i:i+3])} % {DIVISORS[i]} = ", end="")
-            print(mergeDigitsToNum(*digitsToTest[i:i+3]) % DIVISORS[i])
-            print(conditionsAsRemainder[i](*digitsToTest[i:i+3]))
+            print(conditionsAsStringInstance[i](*digitsToTest[i:i+3]))
             print(cond(*digitsToTest[i:i+3]))
-    
-
-if __name__ == '__main__':
-    # print(sum(recursivelyFindPandigitalsStart(startingList)))
-    pandigitals = recursivelyFindPandigitalsStart(startingList)
-    print(pandigitals)
-    testDivisions(pandigitals)
